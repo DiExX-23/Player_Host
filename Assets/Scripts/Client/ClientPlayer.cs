@@ -12,7 +12,6 @@ public class ClientPlayer : MonoBehaviour
     private Type keyboardType;
     private PropertyInfo keyboardCurrentProp;
     private object keyboardCurrentInstance;
-
     private Rigidbody rb;
     private Vector3 pendingDelta = Vector3.zero;
 
@@ -27,7 +26,8 @@ public class ClientPlayer : MonoBehaviour
         if (keyboardType != null)
         {
             keyboardCurrentProp = keyboardType.GetProperty("current", BindingFlags.Static | BindingFlags.Public);
-            if (keyboardCurrentProp != null) keyboardCurrentInstance = keyboardCurrentProp.GetValue(null);
+            if (keyboardCurrentProp != null)
+                keyboardCurrentInstance = keyboardCurrentProp.GetValue(null);
         }
 
         rb = GetComponent<Rigidbody>();
@@ -43,6 +43,7 @@ public class ClientPlayer : MonoBehaviour
     private void Update()
     {
         Vector2 delta2 = Vector2.zero;
+
         if (IsPressed(KeyCode.UpArrow, "upArrowKey")) delta2 += Vector2.up;
         if (IsPressed(KeyCode.DownArrow, "downArrowKey")) delta2 += Vector2.down;
         if (IsPressed(KeyCode.LeftArrow, "leftArrowKey")) delta2 += Vector2.left;

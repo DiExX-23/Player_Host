@@ -1,4 +1,3 @@
-// HostPlayer.cs
 using System;
 using System.Globalization;
 using System.Reflection;
@@ -10,7 +9,8 @@ public class HostPlayer : MonoBehaviour
     [SerializeField] private TCPServer tcpServer;
     [SerializeField] private TCPServerUI tcpServerUI;
     [SerializeField] private float moveSpeed = 5f;
-    private const string HostId = "HOST";
+
+    public static string HostId { get; private set; } = "HOST";
 
     private Type keyboardType;
     private PropertyInfo keyboardCurrentProp;
@@ -21,6 +21,8 @@ public class HostPlayer : MonoBehaviour
 
     private void Start()
     {
+        HostId = "HOST";
+
         if (tcpServer == null) tcpServer = GetComponent<TCPServer>();
         if (tcpServerUI == null) tcpServerUI = GetComponent<TCPServerUI>();
         if (tcpServer != null && tcpServerUI != null) tcpServer.StartServer(tcpServerUI.serverPort);
