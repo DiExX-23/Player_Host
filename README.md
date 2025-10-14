@@ -1,2 +1,3 @@
-# Player_Host
-Este repositorio implementa una conexión TCP básica en la que un jugador actúa como host, mientras que los demás se conectan a él como clientes.
+Laberinto es un juego multijugador creado en Unity donde varios jugadores compiten en un laberinto y gana quien llega primero al centro. El sistema está construido sobre conexiones TCP personalizadas, sin depender de servicios externos, lo que permite partidas locales simples y estables entre un anfitrión y varios clientes.
+
+El jugador que crea la partida actúa como host, mientras los demás se conectan como clientes ingresando su dirección IP. El servidor gestiona las conexiones y sincroniza las posiciones de todos los jugadores en tiempo real. Cuando el anfitrión decide cerrar la sesión, el juego envía un mensaje global que desconecta a los clientes de forma segura y los devuelve al menú principal.
