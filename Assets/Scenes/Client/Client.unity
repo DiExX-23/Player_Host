@@ -14120,9 +14120,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameEndController
   winPanel: {fileID: 1283741292}
   losePanel: {fileID: 1624389844}
-  tcpServer: {fileID: 0}
-  tcpClient: {fileID: 1276863894}
   mainMenuSceneName: Menu Client
+  isHost: 0
 --- !u!4 &1488926802
 Transform:
   m_ObjectHideFlags: 0
