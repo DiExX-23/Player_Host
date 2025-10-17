@@ -52,7 +52,7 @@ Cada escena tiene su propio sistema de menús, controladores y lógicas de red.
 ---
 
 ### **2. Ejecución como Host**
-1. Abre la escena `HostScene`.  
+1. Abre la escena `MenuHost`.  
 2. Ejecuta el juego desde Unity o genera una **Build** (Recomendado: Windows/Mac).  
 3. El host mostrará su dirección IP local.  
 4. Los clientes deben usar esa IP para conectarse.  
@@ -61,7 +61,7 @@ Cada escena tiene su propio sistema de menús, controladores y lógicas de red.
 ---
 
 ### **3. Ejecución como Cliente**
-1. Abre la escena `ClientScene`.  
+1. Abre la escena `MenuClient`.  
 2. Ingresa la **IP del Host** y presiona “Conectar”.  
 3. Al conectarse, el cliente podrá moverse y ver reflejadas las posiciones de los demás jugadores.  
 4. Si el host se desconecta, el cliente será desconectado automáticamente.
