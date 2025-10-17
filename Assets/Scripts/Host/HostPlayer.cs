@@ -1,16 +1,14 @@
 using System;
 using System.Globalization;
 using System.Reflection;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class HostPlayer : MonoBehaviour
 {
-    [SerializeField] private TCPServer tcpServer;
-    [SerializeField] private TCPServerUI tcpServerUI;
     [SerializeField] private float moveSpeed = 5f;
-
-    public static string HostId { get; private set; } = "HOST";
+    public static string HostId = "HOST";
 
     private Type keyboardType;
     private PropertyInfo keyboardCurrentProp;
@@ -19,13 +17,12 @@ public class HostPlayer : MonoBehaviour
     private Rigidbody rb;
     private Vector3 pendingDelta = Vector3.zero;
 
+    private TCPServer tcpServer;
+    private float sendInterval = 0.1f;
+
     private void Start()
     {
-        HostId = "HOST";
-
-        if (tcpServer == null) tcpServer = GetComponent<TCPServer>();
-        if (tcpServerUI == null) tcpServerUI = GetComponent<TCPServerUI>();
-        if (tcpServer != null && tcpServerUI != null) tcpServer.StartServer(tcpServerUI.serverPort);
+        tcpServer = FindFirstObjectByType<TCPServer>();
 
         keyboardType = FindType("UnityEngine.InputSystem.Keyboard");
         if (keyboardType != null)
@@ -42,6 +39,8 @@ public class HostPlayer : MonoBehaviour
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
+
+        StartCoroutine(SendPositionLoop());
     }
 
     private void Update()
@@ -59,19 +58,22 @@ public class HostPlayer : MonoBehaviour
     private void FixedUpdate()
     {
         if (rb == null) return;
-
         Vector3 newPos = rb.position + pendingDelta;
         rb.MovePosition(newPos);
-
-        string pos = newPos.x.ToString(CultureInfo.InvariantCulture) + "," +
-                     newPos.y.ToString(CultureInfo.InvariantCulture) + "," +
-                     newPos.z.ToString(CultureInfo.InvariantCulture);
-        if (tcpServer != null) tcpServer.Broadcast(HostId + "|" + pos);
     }
 
-    private void OnDestroy()
+    private IEnumerator SendPositionLoop()
     {
-        if (tcpServer != null) tcpServer.StopServer();
+        while (true)
+        {
+            yield return new WaitForSeconds(sendInterval);
+            if (tcpServer != null)
+            {
+                Vector3 p = transform.position;
+                string msg = $"POS|{HostId}|{p.x.ToString(CultureInfo.InvariantCulture)}|{p.y.ToString(CultureInfo.InvariantCulture)}|{p.z.ToString(CultureInfo.InvariantCulture)}";
+                tcpServer.Broadcast(msg);
+            }
+        }
     }
 
     private bool IsPressed(KeyCode kc, string inputSystemPropName)

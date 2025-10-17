@@ -1,27 +1,38 @@
 using System;
 using System.Globalization;
 using System.Reflection;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
-    public static string LocalClientId { get; private set; } // <--- restaurada
+    public static string LocalClientId { get; private set; }
 
     private Type keyboardType;
     private PropertyInfo keyboardCurrentProp;
     private object keyboardCurrentInstance;
+
     private Rigidbody rb;
     private Vector3 pendingDelta = Vector3.zero;
 
+    private TCPClient tcpClient;
+    private float sendInterval = 0.1f;
+
     private void Awake()
     {
-        LocalClientId = Guid.NewGuid().ToString();
+        var tcp = FindFirstObjectByType<TCPClient>();
+        if (tcp != null && string.IsNullOrEmpty(LocalClientId))
+        {
+            LocalClientId = Guid.NewGuid().ToString();
+        }
     }
 
     private void Start()
     {
+        tcpClient = FindFirstObjectByType<TCPClient>();
+
         keyboardType = FindType("UnityEngine.InputSystem.Keyboard");
         if (keyboardType != null)
         {
@@ -38,6 +49,8 @@ public class ClientPlayer : MonoBehaviour
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
+
+        StartCoroutine(SendPositionLoop());
     }
 
     private void Update()
@@ -57,6 +70,20 @@ public class ClientPlayer : MonoBehaviour
     {
         if (rb == null) return;
         rb.MovePosition(rb.position + pendingDelta);
+    }
+
+    private IEnumerator SendPositionLoop()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(sendInterval);
+            if (tcpClient != null && !string.IsNullOrEmpty(LocalClientId))
+            {
+                Vector3 p = transform.position;
+                string msg = $"POS|{LocalClientId}|{p.x.ToString(CultureInfo.InvariantCulture)}|{p.y.ToString(CultureInfo.InvariantCulture)}|{p.z.ToString(CultureInfo.InvariantCulture)}";
+                tcpClient.Send(msg);
+            }
+        }
     }
 
     private bool IsPressed(KeyCode kc, string inputSystemPropName)
